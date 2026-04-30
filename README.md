@@ -1,8 +1,7 @@
 # The setup was never the thing — interactive companion
 
 Five Plotly demos for the Substack essay *"Nobody can teach you trading the
-way retail wants it taught."* Built in the style of Roman Paolucci's Quant
-Guild proof, adapted to the article's specific argument.
+way retail wants it taught."*
 
 ## What's in here
 
@@ -97,12 +96,3 @@ python app.py --export-png        # writes png/<demo>.png  (needs kaleido==0.2.1
 For PNG export specifically, use `pip install kaleido==0.2.1`. Newer kaleido
 versions have a regression that breaks Plotly's `write_image()`.
 
-## How the demos relate to Roman's notebook
-
-Roman's notebook proves the same thesis with fewer interactive controls (his
-demos run inside Jupyter). Parameter choices that match his version:
-roulette `18/38`, blackjack stay-16-vs-hit-20, ten players grinding. The
-sizing-and-ruin sweep and state-action heatmap are article-specific.
-
-Credit Roman in the article footnote:
-<https://github.com/romanmichaelpaolucci/Quant-Guild-Library>

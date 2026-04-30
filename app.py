@@ -2,9 +2,7 @@
 Interactive companion demos for "Nobody can teach you trading the way retail wants it taught"
 ================================================================================================
 
-Five Plotly simulations matched to the article's image markers. Built in the style of
-Roman Paolucci's Quant Guild "Quant Proves Trading Can't Be Taught" notebook
-(github.com/romanmichaelpaolucci/Quant-Guild-Library), adapted for the article's argument.
+Five Plotly simulations matched to the article's image markers.
 
 Run modes
 ---------
@@ -48,7 +46,7 @@ from plotly.subplots import make_subplots
 
 
 # ---------------------------------------------------------------------------
-# Shared styling — Roman's dark/neon look, but works on Substack's white bg too
+# Shared styling — clean look that reads on Substack's white background
 # ---------------------------------------------------------------------------
 
 COLOR_A = "rgba(0, 200, 200, 0.9)"   # cyan — "good" trader / positive EV / professional
@@ -272,8 +270,6 @@ def policy_makes_the_path(
     The point isn't blackjack. The point is: the policy you choose changes the
     distribution you sample from. Same game, same cards, different action rule,
     different wealth path.
-
-    This mirrors Roman's notebook cell on blackjack policies.
     """
     rng = np.random.default_rng(seed)
 
@@ -369,7 +365,7 @@ def sizing_and_ruin(
     positive in theory.
 
     This is the single sharpest empirical demonstration that "sizing is policy,
-    not decoration." Aligned with Roman's bankroll management cell.
+    not decoration."
     """
     rng = np.random.default_rng(seed)
 
@@ -535,8 +531,7 @@ def streamlit_app():
 
     st.title("The setup was never the thing")
     st.caption(
-        "Interactive demos for the Substack essay. Built in the style of "
-        "Roman Paolucci's Quant Guild proof, adapted to the article's argument. "
+        "Interactive demos for the Substack essay. "
         "Pull any slider; the chart re-runs the simulation."
     )
 
@@ -638,8 +633,7 @@ def streamlit_app():
 
     st.divider()
     st.caption(
-        "Code: github.com/<your-handle>/setup-was-never-the-thing  ·  "
-        "Inspired by Roman Paolucci's Quant Guild proof  ·  "
+        "Code: github.com/baynk/setup-was-never-the-thing  ·  "
         "Read the full essay on Substack."
     )
 
