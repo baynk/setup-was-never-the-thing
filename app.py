@@ -531,8 +531,7 @@ def streamlit_app():
 
     st.title("The setup was never the thing")
     st.caption(
-        "Interactive demos for the Substack essay. "
-        "Pull any slider; the chart re-runs the simulation."
+        "Interactive companion to the essay. Pick a demo. Move the sliders."
     )
 
     # Deep-link support: ?demo=short_run / fixed_edge / policy / sizing / heatmap
@@ -557,40 +556,41 @@ def streamlit_app():
     if section.startswith("1"):
         st.subheader("Short run lies, long run reveals")
         st.markdown(
-            "Two traders with the same starting wealth and the same trade size. "
-            "Trader A has a small **positive** edge per trade. Trader B has a small "
-            "**negative** edge per trade. The grey dashed line is each trader's *theoretical* "
-            "wealth path — what the math says should happen on average. The colored line "
-            "is one realized sample. At small `n` the colored line wanders far from the "
-            "dashed line. At large `n` it converges."
+            "Two traders. Same starting wealth. Same trade size. Trader A has a small "
+            "positive edge. Trader B has a small negative edge. The dashed line is "
+            "where each trader should be on average. The colored line is one actual run."
         )
-        st.info(
-            "**Try this:** start at `n = 50` and click ➕ on Random seed a few times. "
-            "Watch how unrecognizable the two traders are — sometimes B beats A. "
-            "Then drag `n` up to 5000+ and click ➕ again. Now A is reliably above its "
-            "dashed line and B is reliably below. That's what 'long run reveals' means.",
-            icon="🎲",
+        st.markdown(
+            "Set trades to 50. Click the **+** on Random sample a few times. Sometimes "
+            "B beats A. Sometimes neither line goes anywhere. Now drag trades to 5000 "
+            "and click **+** again. A stays above its dashed line. B stays below. "
+            "Same math both times. The only difference is how long you waited."
         )
         n = st.slider(
             "Number of trades", 20, 5000, 50, step=10,
-            help="How many trades each trader takes. Small n: noise wins. Large n: edge wins.",
+            help="How long the simulation runs. At 50 trades, luck is most of what you see. "
+                 "At 5,000, the edge starts to win. Real trading careers are somewhere "
+                 "in between, which is why most traders never know if they're good or lucky.",
         )
         edge_a = st.slider(
             "Trader A edge per trade ($)", 0.0, 5.0, 1.0, step=0.1,
-            help="Trader A's true expected dollars per trade. The bigger this is, the "
-                 "faster you can distinguish A from a coin-flipper.",
+            help="Average dollars Trader A makes per trade in the long run. Real strategies "
+                 "rarely have an edge this clean. Move this lower to see how a tiny edge "
+                 "still wins eventually, but takes much longer to show up.",
         )
         edge_b = st.slider(
             "Trader B edge per trade ($)", -5.0, 0.0, -1.0, step=0.1,
-            help="Trader B's true expected dollars per trade (negative). Closer to zero "
-                 "= harder to detect that B is actually a losing trader.",
+            help="Same idea, but Trader B loses on average. Move this closer to zero and "
+                 "B becomes nearly impossible to distinguish from a winning trader on "
+                 "any reasonable sample size.",
         )
         seed = st.number_input(
-            "Random seed", value=40, step=1,
-            help="Controls the random outcomes. Same seed = same exact path. "
-                 "Change this to draw a different sample without changing the underlying "
-                 "math. Hammering this button is the whole pedagogical point — at small n, "
-                 "different seeds tell wildly different stories.",
+            "Random sample (seed)", value=40, step=1,
+            help="Each number is one random run of trades. Same trader, same edge, just "
+                 "different luck. Click + to draw a fresh sample without changing anything "
+                 "else. At low trade counts the path will look completely different every "
+                 "time. That's the whole point. You wouldn't grade a coin as biased after "
+                 "ten flips. Same logic for traders.",
         )
         st.plotly_chart(
             short_run_vs_long_run(n_trades=n, edge_a_per_trade=edge_a,
@@ -601,57 +601,52 @@ def streamlit_app():
     elif section.startswith("2"):
         st.subheader("Fixed edge vs dynamic edge")
         st.markdown(
-            "Left: roulette. The casino's edge is fixed at `2/38`, and over enough spins "
-            "the players grind down. The wheel doesn't care who you are or what you "
-            "think you saw last spin.\n\n"
-            "Right: trading. The edge depends on the regime. Shaded windows are "
-            "favorable; unshaded windows are unfavorable. Same setup, different state, "
-            "different distribution."
+            "Left panel: ten people grinding on roulette. The wheel pays the casino a "
+            "fixed cut on every spin. Nobody adapts. Nobody reads anything. The math "
+            "just runs."
         )
-        st.info(
-            "**Try this:** at low `n`, the right panel can look bullish or bearish "
-            "depending on which regime you happen to land in. Crank `n` higher and the "
-            "regime alternation becomes visible — wealth oscillates with the shaded bands. "
-            "A trader who can't tell the regimes apart eats the average and bleeds; "
-            "a trader who can read state captures the favorable windows.",
-            icon="🎯",
+        st.markdown(
+            "Right panel: ten traders in a market where the edge flips between favorable "
+            "(shaded green) and unfavorable. A trader who can't tell the regimes apart "
+            "is forced to take both. A trader who can read state only takes the green "
+            "windows. Same market, different policy, different outcome."
         )
         n = st.slider(
             "Number of bets / trades", 200, 3000, 1000, step=100,
-            help="More bets = more time for the casino's fixed edge to grind players "
-                 "down on the left, and more regime cycles visible on the right.",
+            help="More bets means more time for the casino edge to grind on the left, "
+                 "and more regime flips visible on the right. Try low numbers first to "
+                 "see how a short sample can hide what's actually going on.",
         )
         st.plotly_chart(fixed_vs_dynamic_edge(n_bets=n), use_container_width=True)
 
     elif section.startswith("3"):
         st.subheader("Policy makes the wealth path")
         st.markdown(
-            "Two blackjack policies on the same environment: stay at 16+, or hit until 20. "
-            "Each hand uses the **same shuffled deck** for both policies — apples to apples. "
-            "The action rule alone changes the expected value, and the wealth path that "
-            "comes out the other side."
+            "Two blackjack policies, same shuffled deck on every hand. The first stays "
+            "at 16 or higher. The second hits until 20. Both lose money long term. "
+            "One loses about six times faster than the other."
         )
-        st.info(
-            "**Try this:** click ➕ on the seed a few times and watch π₂ (hit until 20) "
-            "consistently lose much more than π₁ (stay at 16+). The cards are the same. "
-            "The dealer plays the same. Only the action rule changes — and the wealth path "
-            "diverges every time. That's policy.",
-            icon="♠️",
+        st.markdown(
+            "Click **+** on the sample number a few times. The gap between the two "
+            "policies shows up every run. The cards are identical. The dealer is identical. "
+            "Only the action rule changes."
         )
         n = st.slider(
             "Number of hands", 100, 5000, 1000, step=100,
-            help="More hands = the realized EV per hand stabilizes closer to the true "
-                 "EV of each policy.",
+            help="Hands per simulation. More hands means the realized loss rate per hand "
+                 "settles closer to the policy's true expected value.",
         )
         bet = st.slider(
             "Bet size ($)", 1, 100, 10,
-            help="Pure linear scaling — bigger bets just amplify the same path. Doesn't "
-                 "change which policy is better, just how dramatic the dollar gap looks.",
+            help="Just a multiplier. Bigger bets blow up the dollar amounts but don't "
+                 "change which policy is better. Useful if you want the loss to feel "
+                 "real instead of academic.",
         )
         seed = st.number_input(
-            "Random seed", value=11, step=1, key="bj_seed",
-            help="Shuffles the deck differently each time. Try a few seeds to see that "
-                 "π₂ losing to π₁ is the rule, not the exception.",
+            "Random sample (seed)", value=11, step=1, key="bj_seed",
+            help="Reshuffles the deck. Same policies, different cards. The point of "
+                 "trying a few values is to see that the bad policy doesn't get bailed "
+                 "out by lucky shuffles. The math wins on every sample.",
         )
         st.plotly_chart(
             policy_makes_the_path(n_hands=n, bet_size=float(bet), seed=int(seed)),
@@ -661,49 +656,51 @@ def streamlit_app():
     elif section.startswith("4"):
         st.subheader("Sizing and ruin")
         st.markdown(
-            "Identical edge. Identical signal. The **only** thing that changes is "
-            "bet size as a fraction of bankroll. Slide it up. Watch the ruin rate climb "
-            "even though the per-trade edge is unchanged. Red paths are ruined "
-            "(below 10% of starting capital); cyan paths survived."
+            "Same edge. Same signal. The only thing that changes is how much of your "
+            "account you risk per trade. Cyan paths survived. Red paths got wiped out "
+            "below 10% of starting capital."
         )
-        st.info(
-            "**Try this:** start at fraction = 0.10 (almost no ruin, slow growth). "
-            "Crank to 0.50 — ruin appears, median wealth roughly flat. Crank to 1.00 — "
-            "most paths die even though the underlying edge is still positive. Sizing "
-            "isn't about getting rich faster. It's about whether you survive long enough "
-            "for the edge to show up.",
-            icon="💀",
+        st.markdown(
+            "Start at 10% per trade. Almost nobody dies. Move to 50% — ruin shows up, "
+            "median wealth flatlines. Move to 100% — most paths die even though the "
+            "underlying edge is still positive. Sizing isn't about getting rich faster. "
+            "It's about staying in the game long enough for the edge to do anything."
         )
         col1, col2, col3 = st.columns(3)
         with col1:
             frac = st.slider(
                 "Fraction of bankroll per trade", 0.05, 1.00, 0.50, step=0.05,
-                help="Share of your account exposed to each trade. 0.50 = half the account "
-                     "is in the trade, half is in cash. 1.00 = fully invested every trade. "
-                     "Headline slider — move this, watch ruin appear.",
+                help="How much of your account is in the trade. 0.50 means half the "
+                     "account is exposed and half is in cash. 1.00 means the whole "
+                     "account is on the line every trade — which is how people get wiped "
+                     "out even when their edge is real.",
             )
         with col2:
             edge = st.slider(
                 "Underlying edge (%/trade)", -2.0, 5.0, 1.0, step=0.25,
-                help="Mean return of the asset itself, per trade, before sizing. "
-                     "Real-world per-trade edges are usually well under 1%.",
+                help="The asset's average return per trade before sizing. Most real "
+                     "edges in trading are well under 1% per trade. Move this higher "
+                     "and ruin is harder to trigger. Move it negative and you're paying "
+                     "the casino.",
             ) / 100
         with col3:
             vol = st.slider(
                 "Underlying volatility (%/trade)", 5.0, 40.0, 20.0, step=1.0,
                 help=(
-                    "Standard deviation of the asset's per-trade return. Rough realistic "
-                    "ranges: SPY intraday ~0.5–1%, single stock 1d 2–4%, single stock 1wk "
-                    "5–10%, leveraged ETF 1wk 10–15%, weekly options 30%+. Default 20% "
-                    "represents a volatile single-name swing trade. (At this vol with "
-                    "edge=1%, Kelly-optimal fraction is ~25%; above 50% you overbet and "
-                    "bleed via volatility drag — which is the whole point of the demo.)"
+                    "How wild the asset is per trade, measured as standard deviation. "
+                    "Rough rules of thumb: SPY held intraday is around 0.5–1%. A single "
+                    "stock held a day is 2–4%. A leveraged ETF held a week is 10–15%. "
+                    "Weekly options can be 30% or more. Default 20% is a volatile "
+                    "single-name swing trade. At this volatility with a 1% edge, the "
+                    "Kelly-optimal fraction is about 25%. Anything north of 50% means "
+                    "you're overbetting and the path bleeds even when each trade has "
+                    "positive expected value."
                 ),
             ) / 100
         n_paths = st.slider(
             "Number of sample paths", 50, 1000, 200, step=50,
-            help="How many independent traders we simulate. More paths = ruin rate "
-                 "estimate stabilizes, but the chart gets denser.",
+            help="How many traders we simulate side by side. More paths gives you a "
+                 "more stable ruin-rate number, at the cost of a denser chart.",
         )
         st.plotly_chart(
             sizing_and_ruin(edge_per_trade=edge, vol_per_trade=vol,
@@ -714,18 +711,16 @@ def streamlit_app():
     elif section.startswith("5"):
         st.subheader("Where expected value lives")
         st.markdown(
-            "Edge isn't in the pattern. Edge is in the `(state, action)` pair. "
-            "Same action ('buy breakout') has very different EV depending on what state "
-            "you're in. Same state has multiple +EV actions in some cases, zero in others "
-            "(where 'no trade' is the only correct answer)."
+            "Edge doesn't live in the pattern. It lives in the (state, action) pair. "
+            "Same action — buy breakout, fade breakout, whatever — has different "
+            "expected value depending on what state you're in."
         )
-        st.info(
-            "**Try this:** hover any cell to see the exact EV in basis points. Compare the "
-            "'Buy breakout' column across states — it's +60 bps in *Trend day, early* and "
-            "−25 bps in *Trend day, late*. Same action. Different state. Different trade. "
-            "Now compare across rows: in *Drawdown + tilted*, every trading action is "
-            "negative. The only +EV cell is 'Reduce' or 'No trade'.",
-            icon="🗺️",
+        st.markdown(
+            "Hover any cell. Look at *Buy breakout* across rows. It's +60 bps on an "
+            "early trend day. It's −25 bps on a late trend day. Same action, different "
+            "state, different trade. Now look at the *Drawdown + tilted* row. Every "
+            "active trade has negative EV. The only correct moves are *Reduce* or "
+            "*No trade*."
         )
         st.plotly_chart(state_action_ev_heatmap(), use_container_width=True)
 
