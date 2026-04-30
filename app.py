@@ -757,13 +757,17 @@ def export_png(out_dir: Path):
     try:
         import kaleido  # noqa: F401
     except ImportError:
-        print("Install kaleido for PNG export:  pip install kaleido")
+        print("Install kaleido for PNG export:  pip install kaleido==0.2.1")
         return
     out_dir.mkdir(parents=True, exist_ok=True)
+    # Width 1600 matches Substack's full-bleed image width. Scale 3 gives ~4800px
+    # effective width — crisp on retina screens. Height respects each figure's
+    # native aspect (heatmap is tall, time-series are wide).
     for name, builder in DEMOS.items():
         fig = builder()
+        native_height = fig.layout.height or 600
         path = out_dir / f"{name}.png"
-        fig.write_image(str(path), width=1600, height=900, scale=2)
+        fig.write_image(str(path), width=1600, height=native_height, scale=3)
         print(f"wrote {path}")
 
 
