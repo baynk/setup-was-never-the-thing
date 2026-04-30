@@ -678,20 +678,27 @@ def streamlit_app():
         with col1:
             frac = st.slider(
                 "Fraction of bankroll per trade", 0.05, 1.00, 0.50, step=0.05,
-                help="What share of your account is exposed to each trade. This is the "
-                     "headline slider — change this and watch the ruin rate move.",
+                help="Share of your account exposed to each trade. 0.50 = half the account "
+                     "is in the trade, half is in cash. 1.00 = fully invested every trade. "
+                     "Headline slider — move this, watch ruin appear.",
             )
         with col2:
             edge = st.slider(
                 "Underlying edge (%/trade)", -2.0, 5.0, 1.0, step=0.25,
-                help="Mean return of the underlying signal IF you bet the full bankroll. "
+                help="Mean return of the asset itself, per trade, before sizing. "
                      "Real-world per-trade edges are usually well under 1%.",
             ) / 100
         with col3:
             vol = st.slider(
                 "Underlying volatility (%/trade)", 5.0, 40.0, 20.0, step=1.0,
-                help="Standard deviation of the underlying signal. Higher vol = more "
-                     "single-trade risk = ruin appears at lower fractions.",
+                help=(
+                    "Standard deviation of the asset's per-trade return. Rough realistic "
+                    "ranges: SPY intraday ~0.5–1%, single stock 1d 2–4%, single stock 1wk "
+                    "5–10%, leveraged ETF 1wk 10–15%, weekly options 30%+. Default 20% "
+                    "represents a volatile single-name swing trade. (At this vol with "
+                    "edge=1%, Kelly-optimal fraction is ~25%; above 50% you overbet and "
+                    "bleed via volatility drag — which is the whole point of the demo.)"
+                ),
             ) / 100
         n_paths = st.slider(
             "Number of sample paths", 50, 1000, 200, step=50,
