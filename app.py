@@ -529,9 +529,30 @@ def streamlit_app():
         initial_sidebar_state="expanded",
     )
 
-    st.title("The setup was never the thing")
-    st.caption(
-        "Interactive companion to the essay. Pick a demo. Move the sliders."
+    st.markdown(
+        """
+        <style>
+          .block-container {max-width: 1180px; padding-top: 2.2rem; padding-bottom: 2rem;}
+          h1, h2, h3 {letter-spacing: -0.015em;}
+          .hero {border: 1px solid rgba(20,20,20,.10); border-radius: 14px; padding: 1.2rem 1.25rem; background: linear-gradient(180deg, #ffffff 0%, #f7f8f9 100%);}
+          .eyebrow {font-size: .72rem; letter-spacing: .09em; text-transform: uppercase; color: #5f6368; font-weight: 600;}
+          .lede {font-size: 1.03rem; color: #30363b; margin-top: .35rem;}
+          .card {border: 1px solid rgba(20,20,20,.09); border-radius: 12px; padding: .8rem .95rem; background: #fff;}
+          .sidebar-note {font-size: .9rem; color: #4a4f55; line-height: 1.45;}
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        """
+        <div class="hero">
+            <div class="eyebrow">Interactive Companion</div>
+            <h1 style="margin:.2rem 0 .4rem 0;">The setup was never the thing</h1>
+            <div class="lede">A clean, editorial simulation lab for exploring edge, policy, and risk. Choose a chapter in the sidebar, then tune assumptions and inspect how paths change.</div>
+        </div>
+        """,
+        unsafe_allow_html=True,
     )
 
     # Deep-link support: ?demo=short_run / fixed_edge / policy / sizing / heatmap
@@ -551,21 +572,15 @@ def streamlit_app():
     }
     qp = st.query_params.get("demo", "")
     default_idx = query_to_index.get(qp.lower(), 0)
-    section = st.sidebar.radio("Pick a demo", demo_options, index=default_idx)
+    section = st.sidebar.radio("Chapters", demo_options, index=default_idx)
+    st.sidebar.markdown(
+        '<div class="sidebar-note">Tip: deep links still work (`?demo=short_run`, `fixed_edge`, `policy`, `sizing`, `heatmap`).</div>',
+        unsafe_allow_html=True,
+    )
 
     if section.startswith("1"):
         st.subheader("Short run lies, long run reveals")
-        st.markdown(
-            "Two traders. Same starting wealth. Same trade size. Trader A has a small "
-            "positive edge. Trader B has a small negative edge. The dashed line is "
-            "where each trader should be on average. The colored line is one actual run."
-        )
-        st.markdown(
-            "Set trades to 50. Click the **+** on Random sample a few times. Sometimes "
-            "B beats A. Sometimes neither line goes anywhere. Now drag trades to 5000 "
-            "and click **+** again. A stays above its dashed line. B stays below. "
-            "Same math both times. The only difference is how long you waited."
-        )
+        st.markdown('<div class="card"><b>What to notice:</b> The short run is mostly noise; the long run reveals direction. Refresh the seed at low trade counts, then increase sample length and compare path stability.</div>', unsafe_allow_html=True)
         n = st.slider(
             "Number of trades", 20, 5000, 50, step=10,
             help="How long the simulation runs. At 50 trades, luck is most of what you see. "
@@ -600,17 +615,7 @@ def streamlit_app():
 
     elif section.startswith("2"):
         st.subheader("Fixed edge vs dynamic edge")
-        st.markdown(
-            "Left panel: ten people grinding on roulette. The wheel pays the casino a "
-            "fixed cut on every spin. Nobody adapts. Nobody reads anything. The math "
-            "just runs."
-        )
-        st.markdown(
-            "Right panel: ten traders in a market where the edge flips between favorable "
-            "(shaded green) and unfavorable. A trader who can't tell the regimes apart "
-            "is forced to take both. A trader who can read state only takes the green "
-            "windows. Same market, different policy, different outcome."
-        )
+        st.markdown('<div class="card"><b>Read left to right:</b> fixed-edge games grind predictably; state-dependent games reward selection. Edge exists, but only if policy filters regime.</div>', unsafe_allow_html=True)
         n = st.slider(
             "Number of bets / trades", 200, 3000, 1000, step=100,
             help="More bets means more time for the casino edge to grind on the left, "
@@ -621,16 +626,7 @@ def streamlit_app():
 
     elif section.startswith("3"):
         st.subheader("Policy makes the wealth path")
-        st.markdown(
-            "Two blackjack policies, same shuffled deck on every hand. The first stays "
-            "at 16 or higher. The second hits until 20. Both lose money long term. "
-            "One loses about six times faster than the other."
-        )
-        st.markdown(
-            "Click **+** on the sample number a few times. The gap between the two "
-            "policies shows up every run. The cards are identical. The dealer is identical. "
-            "Only the action rule changes."
-        )
+        st.markdown('<div class="card"><b>Controlled experiment:</b> same deck, same game, different policy. Change seed to verify the gap persists across samples.</div>', unsafe_allow_html=True)
         n = st.slider(
             "Number of hands", 100, 5000, 1000, step=100,
             help="Hands per simulation. More hands means the realized loss rate per hand "
@@ -655,17 +651,7 @@ def streamlit_app():
 
     elif section.startswith("4"):
         st.subheader("Sizing and ruin")
-        st.markdown(
-            "Same edge. Same signal. The only thing that changes is how much of your "
-            "account you risk per trade. Cyan paths survived. Red paths got wiped out "
-            "below 10% of starting capital."
-        )
-        st.markdown(
-            "Start at 10% per trade. Almost nobody dies. Move to 50% — ruin shows up, "
-            "median wealth flatlines. Move to 100% — most paths die even though the "
-            "underlying edge is still positive. Sizing isn't about getting rich faster. "
-            "It's about staying in the game long enough for the edge to do anything."
-        )
+        st.markdown('<div class="card"><b>Core lesson:</b> overbetting destroys survival before edge can compound. Move fraction-of-bankroll first, then stress-test with volatility.</div>', unsafe_allow_html=True)
         col1, col2, col3 = st.columns(3)
         with col1:
             frac = st.slider(
@@ -710,18 +696,7 @@ def streamlit_app():
 
     elif section.startswith("5"):
         st.subheader("Where expected value lives")
-        st.markdown(
-            "Edge doesn't live in the pattern. It lives in the (state, action) pair. "
-            "Same action — buy breakout, fade breakout, whatever — has different "
-            "expected value depending on what state you're in."
-        )
-        st.markdown(
-            "Hover any cell. Look at *Buy breakout* across rows. It's +60 bps on an "
-            "early trend day. It's −25 bps on a late trend day. Same action, different "
-            "state, different trade. Now look at the *Drawdown + tilted* row. Every "
-            "active trade has negative EV. The only correct moves are *Reduce* or "
-            "*No trade*."
-        )
+        st.markdown('<div class="card"><b>Interpretation:</b> the decision unit is <i>(state, action)</i>, not pattern names. Scan rows before columns; in some states the optimal decision is to do less.</div>', unsafe_allow_html=True)
         st.plotly_chart(state_action_ev_heatmap(), use_container_width=True)
 
     st.divider()
